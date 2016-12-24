@@ -28,6 +28,7 @@ dbname = 'database.db'
 # register new item
 def _register_item(remind_at, body, channel):
     conn = sqlite3.connect(dbname)
+    conn.text_factory = str
     c = conn.cursor()
 
     sql = 'insert into reminders(created_at, remind_at, message, channel) values (?,?,?,?)'
@@ -68,6 +69,7 @@ def register_reminder(message, body, time):
 @respond_to('reminder list')
 def list_reminder(message):
     conn = sqlite3.connect(dbname)
+    conn.text_factory = str
     c = conn.cursor()
 
     c.execute( "select * from reminders" )
@@ -89,8 +91,6 @@ def list_reminder(message):
 class PollingThread(threading.Thread):
     def __init__(self, dbname):
         super(PollingThread, self).__init__()
-        conn = sqlite3.connect(dbname)
-        self.cursor = conn.cursor()
         self.client = Slacker(API_TOKEN)
 
     def run(self):
@@ -100,6 +100,7 @@ class PollingThread(threading.Thread):
 
             # search item to remind
             conn = sqlite3.connect(dbname)
+            conn.text_factory = str
             c = conn.cursor()
             c.execute( "select * from reminders" )
             l = c.fetchall()
