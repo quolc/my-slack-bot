@@ -1,6 +1,6 @@
 from slackbot.bot import listen_to, respond_to
 from slacker import Slacker
-from slackbot_settings import API_TOKEN
+from slackbot_settings import API_TOKEN, username, general_channel
 
 import threading
 import time
@@ -108,9 +108,9 @@ class PollingThread(threading.Thread):
                 dt = datetime.datetime.strptime(remind_at, '%Y-%m-%d %H:%M:%S.%f')
                 if dt < datetime.datetime.now():
                     print('posting "{}"'.format(body))
-                    self.client.chat.post_message('#1_general',
-                            "@quolc {} (registered at {})".format(body, created_at),
-                            as_user=True, link_names=['@quolc'])
+                    self.client.chat.post_message(general_channel,
+                            "{} {} (registered at {})".format(username, body, created_at),
+                            as_user=True, link_names=[username])
                     # delete item
                     c.execute( 'delete from reminders where id=?', (item_id,) )
                     conn.commit()
