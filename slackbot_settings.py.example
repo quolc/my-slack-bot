@@ -1,1 +1,10 @@
 API_TOKEN = "XXXX-000000000000-XXXXXXXXXXXXXXXXXXXXXXXX"
+
+DEFAULT_REPLY = 'Sorry but I didn't understand you'
+
+PLUGINS = [
+    'plugins'
+]
+
+username = "@you"
+general_channel = "#general"
