@@ -101,9 +101,9 @@ def list_reminder(message):
     c.execute( "select * from reminders" )
     l = c.fetchall()
     mes = "there are {} items in reminder list:".format(len(l))
-    for (_, time, body, channel) in l:
-        mes = mes + "\n- \"{}\" will be remided at {} (registered in #{})".format(
-                body, time, channel)
+    for (_, created_at, time, body, channel) in l:
+        mes = mes + "\n- \"{}\" will be remided at {} (registered in #{} at {})".format(
+                body, time, channel, created_at)
     message.reply(mes)
 
     c.close()
