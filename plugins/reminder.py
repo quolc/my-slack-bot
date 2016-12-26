@@ -36,28 +36,54 @@ def _register_item(remind_at, body, channel):
 
     conn.commit()
     conn.close()
-    print('I\'ll post "{}" {} seconds later.'.format(body, remind_at, channel))
+    print('I\'ll post "{}" at {}'.format(body, remind_at, channel))
 
 
 ###########################
 # slack reaction funcitons
 ###########################
 
-# register new item
+# register new item (by specifying interval)
 @listen_to('(.*) \(remind (.*) later\)')
-def register_reminder(message, body, time):
+def register_reminder_by_interval(message, body, interval):
     # calculate remaining time to remind
     try:
-        number, unit = time.split()
+        number, unit = interval.split()
         number = float(number)
         if unit[-1] == 's':
             unit = unit[0:-1]
         seconds = int(number * units[unit])
-        d = datetime.datetime.now()
-        d = d + datetime.timedelta(seconds=seconds)
+        dt = datetime.datetime.now()
+        dt = dt + datetime.timedelta(seconds=seconds)
 
         # register to reminder pool
-        _register_item(d, body, message.channel._body['name'])
+        _register_item(dt, body, message.channel._body['name'])
+
+        # reaction
+        message.react('+1')
+    except Exception as e:
+        message.react('question')
+        print(e.message)
+
+# register new item (by specifying when to remind)
+@listen_to('(.*) \(remind at (.*)\)')
+def register_reminder_by_datetime(message, body, remind_at):
+    try:
+        # calculate datetime to remind
+        tmp = datetime.datetime.strptime(remind_at, '%m/%d %H:%M')
+        dt = datetime.datetime.now()
+        dt = dt.replace(
+            month=tmp.month,
+            day=tmp.day,
+            hour=tmp.hour,
+            minute=tmp.minute,
+            second=0,
+        )
+        if tmp.month < dt.month:
+            dt = dt.replace(year=dt.year+1)
+
+        # register to reminder pool
+        _register_item(dt, body, message.channel._body['name'])
 
         # reaction
         message.react('+1')
