@@ -79,7 +79,7 @@ def register_reminder_by_datetime(message, body, remind_at):
             minute=tmp.minute,
             second=0,
         )
-        if tmp.month < dt.month:
+        if tmp.month < datetime.datetime.now().month:
             dt = dt.replace(year=dt.year+1)
 
         # register to reminder pool
